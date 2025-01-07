@@ -1,0 +1,34 @@
+{
+    "menu_options": [
+        {
+            "key": "1",
+            "description": "Obtener lista de cliente",
+            "endpoint": "clienteBean",
+            "data_type": "list"
+        },
+        {
+            "key": "2",
+            "description": "Obtener datos de mi empresa",
+            "endpoint": "miempresa",
+            "data_type": "dict"
+        },
+        {
+            "key": "3",
+            "description": "Obtener lista de Centro de Costos",
+            "endpoint": "centroDeCostoBean",
+            "data_type": "list"
+        },
+        {
+            "key": "4",
+            "description": "Obtener lista de Precios",
+            "endpoint": "listaPrecioBean",
+            "data_type": "list"
+        },
+        {
+            "key": "5",
+            "description": "Obtener lista de Vendedores",
+            "endpoint": "vendedorBean",
+            "data_type": "list"
+        }
+    ]
+}

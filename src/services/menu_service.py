@@ -13,8 +13,10 @@ def run_main_menu(api_client, is_json):
         print("1. Obtener lista de clientes")
         print("2. Obtener datos de mi empresa")
         print("3. Obtener lista de Centro de Costos")
+        print("4. Obtener lista de Precios")
+        print("5. Obtener lista de Vendedores")
         
-        opcion = input("Selecciona una opción (0-3): ")
+        opcion = input("Selecciona una opción (0-5): ")
 
         if opcion == "1":
             try:
@@ -36,14 +38,34 @@ def run_main_menu(api_client, is_json):
                 logger.info(f"Error al obtener los datos de 'mi empresa': {e}")
         elif opcion == "3":
             try:
-                budget_data = api_client.get('centroDeCostoBean')
-                # Procesar y mostrar los datos de presupuestos
-                if isinstance(budget_data, list):
-                    ClientDataProcessor.process_data(budget_data, is_json)
+                cost_center_data = api_client.get('centroDeCostoBean')
+                # Procesar y mostrar los datos de Centro de Costos
+                if isinstance(cost_center_data, list):
+                    ClientDataProcessor.process_data(cost_center_data, is_json)
                 else:
-                    logger.info("Formato inesperado de datos para 'presupuestoBean'.")
+                    logger.info("Formato inesperado de datos para 'centroDeCostoBean'.")
             except Exception as e:
-                logger.info(f"Error al obtener la lista de presupuestos: {e}")
+                logger.info(f"Error al obtener la lista de Centros de Costos: {e}")
+        elif opcion == "4":
+            try:
+                price_list_data = api_client.get('listaPrecioBean')
+                # Procesar y mostrar los datos de Lista de Precios
+                if isinstance(price_list_data, list):
+                    ClientDataProcessor.process_data(price_list_data, is_json)
+                else:
+                    logger.info("Formato inesperado de datos para 'listaPrecioBean'.")
+            except Exception as e:
+                logger.info(f"Error al obtener la lista de Precios: {e}")
+        elif opcion == "5":
+            try:
+                seller_data = api_client.get('vendedorBean')
+                # Procesar y mostrar los datos de Vendedores
+                if isinstance(seller_data, list):
+                    ClientDataProcessor.process_data(seller_data, is_json)
+                else:
+                    logger.info("Formato inesperado de datos para 'vendedorBean'.")
+            except Exception as e:
+                logger.info(f"Error al obtener la lista de Vendedores: {e}")
         elif opcion == "0":
             logger.info("Saliendo del programa. ¡Hasta luego!")
             break
