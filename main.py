@@ -73,9 +73,9 @@ class ClientDataProcessor:
                 if not data:
                     logger.info("No se encontraron datos de clientes.")
                     return
-
+                print()
                 # Convertir los datos a formato tabular
-                table = [[client.get('id', 'N/A'), client.get('nombre', 'N/A'), client.get('email', 'N/A')] for client in data]
+                table = [[client.get('cliente_id', 'N/A'), client.get('nombre', 'N/A'), client.get('email', 'N/A')] for client in data]
                 headers = ["ID", "Nombre", "Email"]
 
                 logger.info(tabulate(table, headers, tablefmt="grid"))
