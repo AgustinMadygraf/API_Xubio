@@ -8,6 +8,11 @@ import os
 import json
 from abc import ABC, abstractmethod
 from src.logs.info_error_filter import InfoErrorFilter
+from dotenv import load_dotenv  # Importar load_dotenv
+import sys
+
+# Cargar las variables de entorno desde .env
+load_dotenv()
 
 class ConfigStrategy(ABC):
     """Abstract base class for configuration strategies."""
@@ -42,11 +47,44 @@ class LoggerConfigurator:
     def configure(self):
         """Configures the logger using the provided strategy."""
         config = self.config_strategy.load_config()
+        
+        # Cargar la variable IS_DEVELOPMENT desde el entorno
+        is_development_str = os.getenv('IS_DEVELOPMENT', 'false').lower()
+        is_development = is_development_str == 'true'
+
         if config:
+            # Modificar la configuración del handler 'console' basado en IS_DEVELOPMENT
+            handlers = config.get('handlers', {})
+            console_handler = handlers.get('console', None)
+            
+            if console_handler:
+                if is_development:
+                    # En desarrollo, permitir DEBUG
+                    console_handler['level'] = 'DEBUG'
+                else:
+                    # En producción, establecer al menos INFO
+                    console_handler['level'] = 'INFO'
+            else:
+                # Si no existe un handler 'console', podrías agregar uno si es necesario
+                if is_development:
+                    config['handlers']['console'] = {
+                        "class": "logging.StreamHandler",
+                        "level": "DEBUG",
+                        "formatter": "simpleFormatter"
+                    }
+                    # Agregar el handler a los loggers
+                    for logger_name, logger_info in config.get('loggers', {}).items():
+                        logger_info['handlers'].append('console')
+                else:
+                    # En producción, podrías optar por no agregar el handler 'console' o ajustarlo
+                    pass
+
             logging.config.dictConfig(config)
         else:
+            # Configuración por defecto si no se encuentra el archivo de logging.json
             logging.basicConfig(level=self.default_level)
             logging.warning("Logging configuration file not found. Using default settings.")
+
         return logging.getLogger(__name__)
 
 # Configuración inicial del logger para módulos individuales
@@ -54,3 +92,8 @@ initial_config_strategy = JSONConfigStrategy()
 logger_configurator = LoggerConfigurator(config_strategy=initial_config_strategy)
 logger = logger_configurator.configure()
 logger.addFilter(InfoErrorFilter())  # Aplica el filtro InfoErrorFilter
+
+# Configurar el StreamHandler para usar UTF-8 (si es necesario)
+for handler in logger.handlers:
+    if isinstance(handler, logging.StreamHandler):
+        handler.setEncoding('utf-8')
