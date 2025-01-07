@@ -12,12 +12,12 @@ class ConfigLoader:
         load_dotenv()
         client_id = os.getenv('CLIENT_ID')
         secret_id = os.getenv('SECRET_ID')
-        is_development = os.getenv('IS_DEVELOPMENT', 'false').lower() == 'true'
+        is_json = os.getenv('IS_JSON', 'false').lower() == 'true'
 
         if not client_id or not secret_id:
             raise ValueError("CLIENT_ID o SECRET_ID no encontrados en el archivo .env")
         
-        return client_id, secret_id, is_development
+        return client_id, secret_id, is_json
 
 
 class TokenService:
@@ -61,9 +61,9 @@ class APIClient:
 class ClientDataProcessor:
     """Responsable de procesar los datos de clientes."""
     @staticmethod
-    def process_data(data, is_development):
+    def process_data(data, is_json):
         """Procesa y muestra los datos de clientes en formato JSON o tabla."""
-        if is_development:
+        if is_json:
             # Mostrar los datos en formato JSON (modo desarrollo)
             logger.info("Datos en formato JSON:")
             logger.info(data)
@@ -89,7 +89,7 @@ def main():
     print("\nBienvenido al programa de consulta de clientes de Xubio.\n")
     try:
         # Cargar configuración
-        client_id, secret_id, is_development = ConfigLoader.load_env_variables()
+        client_id, secret_id, is_json = ConfigLoader.load_env_variables()
 
         # Obtener token de acceso
         token_service = TokenService(client_id, secret_id)
@@ -107,7 +107,7 @@ def main():
             if opcion == "1":
                 try:
                     client_data = api_client.get('clienteBean')
-                    ClientDataProcessor.process_data(client_data, is_development)
+                    ClientDataProcessor.process_data(client_data, is_json)
                 except Exception as e:
                     logger.info(f"Error al obtener la lista de clientes: {e}")
             elif opcion == "2":
