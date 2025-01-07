@@ -11,9 +11,10 @@ def run_main_menu(api_client, is_json):
         print("\nOpciones:")
         print("0. Salir")
         print("1. Obtener lista de clientes")
-        print("2. Obtener datos de 'mi empresa'")
+        print("2. Obtener datos de mi empresa")
+        print("3. Obtener lista de Centro de Costos")
         
-        opcion = input("Selecciona una opción (0-2): ")
+        opcion = input("Selecciona una opción (0-3): ")
 
         if opcion == "1":
             try:
@@ -33,6 +34,16 @@ def run_main_menu(api_client, is_json):
                     logger.info("Formato inesperado de datos para 'mi empresa'.")
             except Exception as e:
                 logger.info(f"Error al obtener los datos de 'mi empresa': {e}")
+        elif opcion == "3":
+            try:
+                budget_data = api_client.get('centroDeCostoBean')
+                # Procesar y mostrar los datos de presupuestos
+                if isinstance(budget_data, list):
+                    ClientDataProcessor.process_data(budget_data, is_json)
+                else:
+                    logger.info("Formato inesperado de datos para 'presupuestoBean'.")
+            except Exception as e:
+                logger.info(f"Error al obtener la lista de presupuestos: {e}")
         elif opcion == "0":
             logger.info("Saliendo del programa. ¡Hasta luego!")
             break
