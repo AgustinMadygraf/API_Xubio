@@ -1,87 +1,10 @@
 import os
-import requests
-from requests.auth import HTTPBasicAuth
 from dotenv import load_dotenv
-from tabulate import tabulate
 from src.logs.config_logger import logger
-
-class ConfigLoader:
-    """Responsable de cargar la configuración desde un archivo .env."""
-    @staticmethod
-    def load_env_variables():
-        load_dotenv()
-        client_id = os.getenv('CLIENT_ID')
-        secret_id = os.getenv('SECRET_ID')
-        is_json = os.getenv('IS_JSON', 'false').lower() == 'true'
-
-        if not client_id or not secret_id:
-            raise ValueError("CLIENT_ID o SECRET_ID no encontrados en el archivo .env")
-        
-        return client_id, secret_id, is_json
-
-
-class TokenService:
-    """Responsable de manejar la autenticación y la obtención del token."""
-    def __init__(self, client_id: str, secret_id: str):
-        self.client_id = client_id
-        self.secret_id = secret_id
-        self.token_url = 'https://xubio.com/API/1.1/TokenEndpoint'
-
-    def get_access_token(self) -> str:
-        """Solicita un token de acceso."""
-        data = {'grant_type': 'client_credentials'}
-        response = requests.post(self.token_url, data=data, auth=HTTPBasicAuth(self.client_id, self.secret_id))
-
-        if response.status_code != 200:
-            raise ConnectionError(f"Error al obtener el token: {response.status_code}, {response.text}")
-        
-        return response.json().get('access_token')
-
-
-class APIClient:
-    """Responsable de interactuar con los endpoints de la API."""
-    def __init__(self, base_url: str, access_token: str):
-        self.base_url = base_url
-        self.headers = {
-            'Authorization': f'Bearer {access_token}',
-            'Accept': 'application/json'
-        }
-
-    def get(self, endpoint: str) -> dict:
-        """Realiza una solicitud GET a un endpoint específico."""
-        url = f"{self.base_url}/{endpoint}"
-        response = requests.get(url, headers=self.headers)
-
-        if response.status_code != 200:
-            raise ConnectionError(f"Error en GET {endpoint}: {response.status_code}, {response.text}")
-        
-        return response.json()
-
-
-class ClientDataProcessor:
-    """Responsable de procesar los datos de clientes."""
-    @staticmethod
-    def process_data(data, is_json):
-        """Procesa y muestra los datos de clientes en formato JSON o tabla."""
-        if is_json:
-            # Mostrar los datos en formato JSON (modo desarrollo)
-            logger.info("Datos en formato JSON:")
-            logger.info(data)
-        else:
-            # Mostrar los datos en formato tabla (modo producción)
-            if isinstance(data, list):
-                if not data:
-                    logger.info("No se encontraron datos de clientes.")
-                    return
-                print()
-                # Convertir los datos a formato tabular
-                table = [[client.get('cliente_id', 'N/A'), client.get('nombre', 'N/A'), client.get('email', 'N/A')] for client in data]
-                headers = ["ID", "Nombre", "Email"]
-
-                logger.info(tabulate(table, headers, tablefmt="grid"))
-            else:
-                logger.info("Formato de datos inesperado:", data)
-
+from src.config_loader import ConfigLoader
+from src.token_service import TokenService
+from src.api_client import APIClient
+from src.services.client_data_processor import ClientDataProcessor
 
 # Punto de entrada del script
 def main():
