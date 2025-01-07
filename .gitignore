@@ -1,1 +1,3 @@
 .env
+src/logs/sistema.log
+src/logs/__pycache__/

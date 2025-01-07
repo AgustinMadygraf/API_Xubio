@@ -3,7 +3,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from dotenv import load_dotenv
 from tabulate import tabulate
-
+from src.logs.config_logger import logger
 
 class ConfigLoader:
     """Responsable de cargar la configuración desde un archivo .env."""
@@ -65,26 +65,28 @@ class ClientDataProcessor:
         """Procesa y muestra los datos de clientes en formato JSON o tabla."""
         if is_development:
             # Mostrar los datos en formato JSON (modo desarrollo)
-            print("Datos en formato JSON:")
-            print(data)
+            logger.info("Datos en formato JSON:")
+            logger.info(data)
         else:
             # Mostrar los datos en formato tabla (modo producción)
             if isinstance(data, list):
                 if not data:
-                    print("No se encontraron datos de clientes.")
+                    logger.info("No se encontraron datos de clientes.")
                     return
 
                 # Convertir los datos a formato tabular
                 table = [[client.get('id', 'N/A'), client.get('nombre', 'N/A'), client.get('email', 'N/A')] for client in data]
                 headers = ["ID", "Nombre", "Email"]
 
-                print(tabulate(table, headers, tablefmt="grid"))
+                logger.info(tabulate(table, headers, tablefmt="grid"))
             else:
-                print("Formato de datos inesperado:", data)
+                logger.info("Formato de datos inesperado:", data)
 
 
 # Punto de entrada del script
 def main():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("\nBienvenido al programa de consulta de clientes de Xubio.\n")
     try:
         # Cargar configuración
         client_id, secret_id, is_development = ConfigLoader.load_env_variables()
@@ -92,8 +94,7 @@ def main():
         # Obtener token de acceso
         token_service = TokenService(client_id, secret_id)
         access_token = token_service.get_access_token()
-        print('Access Token obtenido:', access_token)
-
+        logger.info('Access Token obtenido: %s', access_token)
         # Consumir API
         api_client = APIClient(base_url='https://xubio.com/API/1.1', access_token=access_token)
 
@@ -108,15 +109,15 @@ def main():
                     client_data = api_client.get('clienteBean')
                     ClientDataProcessor.process_data(client_data, is_development)
                 except Exception as e:
-                    print(f"Error al obtener la lista de clientes: {e}")
+                    logger.info(f"Error al obtener la lista de clientes: {e}")
             elif opcion == "2":
-                print("Saliendo del programa. ¡Hasta luego!")
+                logger.info("Saliendo del programa. ¡Hasta luego!")
                 break
             else:
-                print("Opción inválida. Por favor, selecciona una opción válida.")
+                logger.info("Opción inválida. Por favor, selecciona una opción válida.")
     
     except Exception as e:
-        print(f"Error: {e}")
+        logger.info(f"Error: {e}")
 
 
 if __name__ == '__main__':
