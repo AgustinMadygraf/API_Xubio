@@ -12,7 +12,7 @@ from src.api_client import APIClient
 from src.services.menu_service import run_main_menu
 
 def main():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    #os.system('cls' if os.name == 'nt' else 'clear')
     print("\nBienvenido al programa de consulta de clientes de Xubio.\n")
     try:
         # Cargar configuración
