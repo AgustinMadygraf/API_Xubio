@@ -107,25 +107,70 @@
 
 ---
 
-## **3. Escalabilidad e Integración con Django**
+## **3. Escalabilidad e Integración con Flask** 
+facu estoy cansado, luego lo reviso bien este apartado.
 
-- [ ] **Mantener una estructura compatible con la migración a Django**
-  - **Propuesta de modificación**: Planificar las carpetas y módulos de manera que puedan convertirse en una o varias apps de Django (p. ej., separar “services” y “api” en aplicaciones de Django).
+### **3.1. Estructura compatible con Flask**
 
-- [ ] **Centralizar la lógica de negocio en servicios reutilizables**
-  - **Propuesta de modificación**: Asegurarse de que el código de consulta a la API y el procesamiento de datos sea fácilmente invocable desde vistas/controladores en Django.
+- [ ] **Organizar carpetas para Flask**  
+  - **Propuesta**: Mantener un directorio principal (p. ej., `app_flask/`) con los siguientes subdirectorios:  
+    - `routes/` para las rutas o *blueprints*,  
+    - `services/` para la lógica de negocio (compartida con la consola),  
+    - `static/` y `templates/` (si se utilizará front-end HTML).  
+  - **Objetivo**: Facilitar la integración con Flask, conservando la modularidad.
 
-- [ ] **Definir el flujo para la interfaz web y la consola**
-  - **Duda/Pendiente**: Precisar cómo se compartirán los servicios/lógica entre la consola y el entorno Django (¿un mismo módulo importado o dos “frontends” distintos?).
+- [ ] **Mantener “app_console” separado**  
+  - **Propuesta**: Colocar la lógica y el script principal de la consola en una carpeta como `app_console/`, importando los servicios desde la misma ubicación que “app_flask”.
 
-- [ ] **Revisar el esquema de usuarios en Django**
-  - **Duda/Pendiente**: Confirmar si el token será compartido entre múltiples usuarios o si cada usuario tendrá su propia sesión/autenticación con la API Xubio.
+---
 
-- [ ] **Renombrar o mover “src” para ajustarlo al estándar de Django**
-  - **Propuesta de modificación**: Convertir cada parte (servicios, logs, etc.) en aplicaciones Django (por ejemplo, una app “logs”, otra app “xubio_api”, etc.).
+### **3.2. Centralizar la lógica de negocio en servicios reutilizables**
 
-- [ ] **Mantener el código de consola en un módulo separado (si sigue coexistiendo)**
-  - **Propuesta de modificación**: Tener un archivo principal para la CLI que importe la lógica de `src`, de modo que no interfiera con la estructura Django.
+- [ ] **Compartir clases y funciones entre consola y Flask**  
+  - **Propuesta**: Crear (o mantener) un directorio `services/` que contenga:  
+    - `token_service.py`  
+    - `client_data_processor.py`  
+    - Cualquier otra clase encargada de la lógica de negocio.  
+  - **Objetivo**: Evitar duplicación de código y garantizar que ambos puntos de entrada (consola y Flask) accedan a la misma funcionalidad.
 
-- [ ] **Actualizar documentación interna y scripts de arranque** 
-  - **Duda/Pendiente**: Ver cómo se ejecutará la aplicación en entorno local y documentar el proceso (e.g., `python manage.py runserver` para Django y un script separado para la consola).
+- [ ] **Mantener un solo token compartido**  
+  - **Propuesta**: Desde `services/token_service.py` o un “config manager”, manejar la lectura/escritura de `config.json` para todos los usuarios de la aplicación (CLI y Flask).  
+  - **Objetivo**: Asegurar que siempre se use el mismo token, sin requerir múltiples validaciones para cada usuario.
+
+---
+
+### **3.3. Definir el flujo para la interfaz web y la consola**
+
+- [ ] **Diseñar endpoints de Flask**  
+  - **Propuesta**: Crear un archivo de rutas (por ejemplo, `routes/xubio_routes.py`) que, al recibir una solicitud HTTP, invoque los métodos de los servicios para obtener o procesar datos.  
+  - **Objetivo**: Ofrecer la misma funcionalidad disponible en la consola (listar clientes, obtener datos de empresa, etc.) a través de endpoints HTTP.
+
+- [ ] **Mantener un script de consola**  
+  - **Propuesta**: En `app_console/main.py` o similar, conservar la interfaz de línea de comandos que use la misma lógica de `services/`.  
+  - **Objetivo**: Permitir que la solución sea ejecutable tanto desde la terminal como desde un navegador.
+
+---
+
+### **3.4. Ejecución y despliegue en servidor local**
+
+- [ ] **Configuración del servidor Flask**  
+  - **Propuesta**: En `app_flask/__init__.py` o `run.py`, inicializar la app Flask con la configuración base.  
+  - **Objetivo**: Permitir el arranque local con el comando `flask run` o un script personalizado.
+
+- [ ] **Documentar el arranque simultáneo**  
+  - **Propuesta**: Explicar en el README los pasos para:  
+    1. Ejecutar la consola (`python app_console/main.py`).  
+    2. Ejecutar la app Flask (`python run.py` o `flask run`).  
+  - **Objetivo**: Que otros desarrolladores o usuarios puedan elegir la interfaz que mejor se adapte a sus necesidades.
+
+---
+
+### **3.5. Actualizar la documentación interna**
+
+- [ ] **Instrucciones de uso para consola y Flask**  
+  - **Propuesta**: Indicar en el README o en la documentación:  
+    - Cómo funciona la CLI (comandos disponibles, opciones).  
+    - Cómo consumir los endpoints Flask (URLs, parámetros, ejemplos de uso con Postman/cURL).
+
+- [ ] **Explicar uso de `config.json`**  
+  - **Propuesta**: Destacar que el token se comparte entre ambos entornos, detallando dónde se ubica el archivo y cómo se evita su inclusión en el repositorio (`.gitignore`).
