@@ -1,152 +1,125 @@
-# TO DO List: Modularización del Proyecto
+# To Do List
 
-## Objetivo
-Refactorizar el proyecto actual para seguir un patrón de diseño modular basado en POO, SOLID y una estructura `src`.
+## **1. Refactor de Menú y Uso de `menu_config.json`**
 
----
-
-## Tareas
-
-### 1. Crear la estructura de directorios
-- [x] Crear la carpeta `src/`.
-- [x] Crear subcarpetas:
-  - [x] `src/services/`
-  - [x] `src/logs/`
-
-### 2. Modularización del Procesador de Datos
-- [x] Crear el archivo `src/processors/client_processor.py`.
-  - **Descripción**: Mover la lógica de procesamiento de datos de clientes a esta clase.
-  - **Tareas**:
-    - [x] Implementar el formato de salida (JSON o tabla) según la variable `IS_DEVELOPMENT`.
-    - [x] Validar y manejar datos inesperados (listas vacías, claves faltantes, etc.).
-
-### 3. Refactorización del `main.py`
-- [x] Actualizar `main.py` para interactuar con los módulos refactorizados.
-  - **Descripción**: Simplificar el script principal, delegando responsabilidades a los módulos correspondientes.
-  - **Tareas**:
-    - [x] Importar los módulos desde `src/`.
-    - [x] Manejar errores globales de forma elegante.
-    - [x] Mantener una interfaz de usuario clara y funcional.
-
-### 4. Pruebas Unitarias
-- [ ] Crear una carpeta `tests/` para pruebas unitarias.
-  - [ ] Probar `ClientDataProcessor` con datos válidos, vacíos y malformados.
-### **1. Análisis Extenso de SOLID en General y en Particular el Principio O (Abierto/Cerrado)**
-
-#### **General SOLID:**
-- **S (Single Responsibility Principle):**
-  - `main.py` tiene múltiples responsabilidades: cargar configuraciones, manejar errores globales y ejecutar el menú principal.
-  - `menu_service.py` mezcla la lógica de menú con detalles específicos de los servicios.
-  - `client_data_processor.py` se enfoca solo en procesar datos de clientes, cumpliendo bien con SRP.
-
-- **O (Open/Closed Principle):**
-  - Actualmente, extender las funcionalidades del menú (por ejemplo, agregar nuevas opciones para consultar otros recursos de la API) requiere modificar `menu_service.py` y potencialmente otras partes del código, rompiendo OCP.
-  - `ClientDataProcessor` no está preparado para manejar otros formatos de datos sin modificaciones significativas.
-
-- **L (Liskov Substitution Principle):**
-  - No se utiliza herencia, lo cual simplifica la evaluación. Las implementaciones existentes cumplen con este principio al ser estáticas y específicas.
-
-- **I (Interface Segregation Principle):**
-  - Las clases actuales no están sobrecargadas con interfaces innecesarias. Sin embargo, la separación lógica podría mejorar para evitar dependencia de métodos no utilizados.
-
-- **D (Dependency Inversion Principle):**
-  - `main.py` depende de concreciones (`menu_service`, `TokenService`) en lugar de abstracciones. Esto dificulta reemplazar módulos con implementaciones alternativas.
+A continuación se describe la **propuesta de modificación** para cada subtarea de la **Tarea 1: “Refactor de Menú y Uso de `menu_config.json`”**. No se proporcionan fragmentos de código, sino lineamientos y objetivos concretos de refactorización.
 
 ---
 
-#### **Particular O (Open/Closed Principle):**
-1. **Problemas Identificados:**
-   - El menú (`menu_service.py`) está diseñado con lógica condicional directa (`if-elif`) que no es escalable para añadir nuevas funcionalidades.
-   - El procesador de datos (`client_data_processor.py`) está limitado a clientes y formatos JSON/tabla. Para manejar más tipos de datos o formatos, sería necesario modificar esta clase directamente.
+### **1.1. Crear una clase o interfaz común para todas las opciones de menú**
 
-2. **Objetivos del Refactor:**
-   - Modularizar la lógica del menú para que nuevas opciones puedan añadirse sin modificar `menu_service.py`.
-   - Diseñar `ClientDataProcessor` para ser extensible, permitiendo agregar nuevos formatos de salida o tipos de datos sin alterar el código existente.
-   - Introducir abstracciones y patrones de diseño (como el patrón Estrategia) para promover la extensibilidad.
-
----
-
-### **2. Plan de Trabajo**
-
-**Objetivo General:**
-Refactorizar `main.py`, `menu_service.py`, y `client_data_processor.py` para cumplir con el Principio de Abierto/Cerrado (OCP) y mejorar la adherencia a SOLID en general.
-
-#### **Tareas:**
-
-### **A. Modificar `menu_service.py`**
-1. **Crear un registro dinámico de opciones de menú:**
-   - **Archivo:** `src/services/menu_service.py`
-   - **Tarea:** Introducir una estructura de registro basada en clases para manejar las opciones del menú.
-   - **Descripción:** Cada opción de menú será representada por una clase que implemente una interfaz común. `menu_service.py` delegará la ejecución de opciones a estas clases.
-
-2. **Crear una clase base para opciones de menú:**
-   - **Archivo:** `src/services/menu_option_base.py` (nuevo archivo)
-   - **Tarea:** Crear una interfaz (clase abstracta) `MenuOption` con métodos como `display` y `execute`.
-   - **Descripción:** Todas las opciones del menú deben implementar esta interfaz.
-
-3. **Registrar dinámicamente las opciones del menú:**
-   - **Archivo:** `src/services/menu_registry.py` (nuevo archivo)
-   - **Tarea:** Implementar un registro de opciones del menú que permita añadir nuevas opciones sin modificar `menu_service.py`.
-   - **Descripción:** El menú iterará sobre las opciones registradas para mostrar y ejecutar las selecciones.
+- **Archivo Sugerido**: Podría ser `src/services/menu_option_base.py` (o un nombre equivalente).
+- **Objetivo**: 
+  - Definir una estructura uniforme que represente a cada opción del menú (por ejemplo, un método para obtener la clave, otro para ejecutar la lógica asociada, etc.).
+- **Propuesta de Modificación**:
+  1. Crear una clase base (o interfaz) que declare métodos esenciales, por ejemplo:
+     - `get_key()`: para identificar la opción del menú (coincidente con `key` en el JSON).
+     - `get_description()`: para describir la opción (coincidente con `description` en el JSON).
+     - `execute()`: para contener la lógica que se ejecuta al seleccionar la opción.
+  2. Asegurarse de que cada opción de `menu_config.json` pueda transformarse en una instancia de esta clase base o de una subclase especializada.
+  3. Mantener la consistencia: todas las opciones deben tener un **formato y comportamiento coherente** al ser llamadas.
 
 ---
 
-### **B. Refactorizar `client_data_processor.py`**
-1. **Diseñar una estructura extensible para procesadores de datos:**
-   - **Archivo:** `src/services/data_processor_base.py` (nuevo archivo)
-   - **Tarea:** Crear una clase base `DataProcessor` con un método abstracto `process`.
-   - **Descripción:** Las clases concretas extenderán esta base para manejar diferentes tipos de datos.
+### **1.2. Diseñar un mecanismo dinámico para leer y generar las opciones de menú desde `menu_config.json`**
 
-2. **Crear procesadores específicos:**
-   - **Archivo:** `src/services/client_data_processor.py` (actualizar)
-   - **Tarea:** Implementar `ClientDataProcessor` como una subclase de `DataProcessor`.
-   - **Descripción:** Mover la lógica actual a esta clase y prepararla para coexistir con otros procesadores.
-
-3. **Registrar los procesadores disponibles:**
-   - **Archivo:** `src/services/data_processor_registry.py` (nuevo archivo)
-   - **Tarea:** Implementar un registro que permita mapear tipos de datos a procesadores específicos.
-   - **Descripción:** Esto permitirá extender la funcionalidad agregando nuevos procesadores sin modificar el código existente.
+- **Archivo Sugerido**: Se podría centralizar en `src/services/menu_registry.py` o en una sección específica dentro de `menu_service.py`.
+- **Objetivo**: 
+  - Eliminar la dependencia de múltiples `if-elif`.
+  - Permitir que, al modificar el archivo JSON, se actualicen las opciones de manera transparente.
+- **Propuesta de Modificación**:
+  1. Implementar un método que **lea** el contenido de `menu_config.json` solo una vez al inicio o cada vez que se requiera (según la necesidad de recarga en caliente).
+  2. Para cada objeto en `"menu_options"`, crear una instancia de la clase base (o de subclases especializadas, si se dieran casos diferentes).
+  3. Al presentar el menú, iterar automáticamente por la lista de objetos cargados, mostrando la descripción de cada opción.
+  4. Al capturar la selección del usuario, **buscar la opción** correspondiente (por `key`) e **invocar** el método `execute()` de esa instancia.
 
 ---
 
-### **C. Modificar `main.py`**
-1. **Adaptar el flujo principal a la nueva estructura de menú:**
-   - **Archivo:** `main.py`
-   - **Tarea:** Reemplazar las llamadas directas al menú con la nueva estructura de registro.
-   - **Descripción:** Simplificar `main.py` delegando responsabilidades a `menu_registry.py` y las clases de opciones de menú.
+### **1.3. Centralizar la lógica de “llamada a la API + procesamiento de datos” en un método común**
 
-2. **Agregar soporte para procesadores dinámicos:**
-   - **Archivo:** `main.py`
-   - **Tarea:** Reemplazar las referencias directas a `ClientDataProcessor` con una llamada al registro de procesadores.
-   - **Descripción:** Permitir que el sistema determine automáticamente qué procesador utilizar.
-
----
-
-### **D. Crear Nuevas Clases y Archivos**
-
-1. **`menu_option_base.py`:**
-   - Clase abstracta para definir la interfaz de las opciones del menú.
-
-2. **`menu_registry.py`:**
-   - Registro dinámico de opciones del menú. Permitirá agregar opciones al menú desde cualquier lugar del proyecto.
-
-3. **`data_processor_base.py`:**
-   - Clase abstracta para definir la interfaz de los procesadores de datos.
-
-4. **`data_processor_registry.py`:**
-   - Registro dinámico de procesadores de datos. Permitirá mapear tipos de datos a procesadores específicos.
+- **Archivo Sugerido**: Podría ubicarse en una clase auxiliar dentro de `menu_service.py` o en un nuevo archivo como `menu_actions.py`.
+- **Objetivo**:
+  - Evitar la repetición de líneas de código para “realizar la petición al endpoint, capturar la respuesta y procesarla con `ClientDataProcessor`”.
+  - Estandarizar el manejo de errores y la presentación de resultados.
+- **Propuesta de Modificación**:
+  1. Crear una función o método compartido que reciba:
+     - `api_client`
+     - `endpoint`
+     - `data_type` (por ejemplo, “list” o “dict”)
+     - `is_json` (para saber el formato de salida).
+  2. Dentro de esa función, encapsular:
+     - La llamada al método `get()` de `api_client`.
+     - La verificación del tipo de dato devuelto (si es lista o diccionario).
+     - La llamada a `ClientDataProcessor` para la presentación final.
+  3. En cada opción del menú, en lugar de repetir el consumo de la API y la validación del tipo de dato, simplemente invocar la función centralizada con los parámetros adecuados.
 
 ---
 
-### **E. Pruebas Unitarias**
-1. **Menú:**
-   - **Archivo:** `tests/test_menu_service.py`
-   - **Tareas:**
-     - Verificar que las opciones del menú se registren correctamente.
-     - Asegurar que las opciones del menú ejecutan la lógica esperada.
+### **1.4. Validar casos de uso de `menu_config.json` estático o actualización futura**
 
-2. **Procesadores de Datos:**
-   - **Archivo:** `tests/test_data_processor.py`
-   - **Tareas:**
-     - Verificar que los procesadores se registren y ejecuten correctamente.
-     - Probar casos de datos vacíos, mal formados y válidos.
+- **Objetivo**:
+  - Considerar si el archivo se modificará en caliente (en tiempo de ejecución) o permanecerá estático.
+- **Propuesta de Modificación**:
+  1. **Caso estático**: Cargar el archivo JSON una sola vez al iniciar el programa y mantener la información en memoria. Bastaría con un simple método de lectura y parseo.
+  2. **Caso dinámico**: Implementar un mecanismo para **volver a leer** el archivo cuando se detecten cambios (o a petición explícita). Esto podría requerir:
+     - Una marca temporal o un “último hash” del archivo para saber si se actualizó.
+     - Un flujo que vuelva a instanciar las clases de menú en caliente.
+  3. Definir con claridad si el proyecto **requiere** esta funcionalidad o si basta con suposiciones de inmutabilidad del archivo durante la ejecución.
+
+
+## **2. Almacenamiento del Token en `config.json`**
+
+- [ ] **Verificar la existencia de `config.json` al inicio**
+  - **Propuesta de modificación**: Crear un método para chequear si el archivo existe; si no, crearlo con estructura inicial (token vacío o null, timestamp).
+
+- [ ] **Leer el token y su timestamp; decidir si es válido (<1 hora)**
+  - **Propuesta de modificación**: Implementar lógica para comparar la hora de creación del token con la hora actual.
+
+- [ ] **Solicitar token nuevo si no existe o está vencido; guardar en `config.json`**
+  - **Propuesta de modificación**: Actualizar el archivo con el nuevo token y la nueva marca de tiempo. 
+
+- [ ] **Proteger `config.json`**
+  - **Propuesta de modificación**: Añadirlo a `.gitignore` para que no se suba al repositorio.  
+  - **Duda/Pendiente**: Decidir si se requiere algún cifrado o manipulación adicional por motivos de seguridad.
+
+---
+
+## **3. Manejo de Logs según Entorno (Desarrollo/Producción)**
+
+- [ ] **Continuar usando `IS_DEVELOPMENT` desde `.env` para cambiar la configuración**
+  - **Propuesta de modificación**: Ajustar la configuración de nivel de logs para `DEBUG` o `INFO` de manera automática según el valor de `IS_DEVELOPMENT`.
+
+- [ ] **Redirigir logs a “sistem.log”**
+  - **Propuesta de modificación**: Confirmar la ruta y nombre del archivo, y asegurarse de que se conserve la configuración actual (formato `json`, `filters`, etc.).
+
+- [ ] **Gestionar la rotación o tamaño de “sistem.log”** (si es necesario en el futuro)
+  - **Duda/Pendiente**: Decidir si se requieren mecanismos de rotación de logs (por tamaño o fecha) para evitar archivos de gran tamaño.
+
+---
+
+## **4. Escalabilidad e Integración con Django**
+
+- [ ] **Mantener una estructura compatible con la migración a Django**
+  - **Propuesta de modificación**: Planificar las carpetas y módulos de manera que puedan convertirse en una o varias apps de Django (p. ej., separar “services” y “api” en aplicaciones de Django).
+
+- [ ] **Centralizar la lógica de negocio en servicios reutilizables**
+  - **Propuesta de modificación**: Asegurarse de que el código de consulta a la API y el procesamiento de datos sea fácilmente invocable desde vistas/controladores en Django.
+
+- [ ] **Definir el flujo para la interfaz web y la consola**
+  - **Duda/Pendiente**: Precisar cómo se compartirán los servicios/lógica entre la consola y el entorno Django (¿un mismo módulo importado o dos “frontends” distintos?).
+
+- [ ] **Revisar el esquema de usuarios en Django**
+  - **Duda/Pendiente**: Confirmar si el token será compartido entre múltiples usuarios o si cada usuario tendrá su propia sesión/autenticación con la API Xubio.
+
+---
+
+## **5. Reestructuración de Carpetas**
+
+- [ ] **Renombrar o mover “src” para ajustarlo al estándar de Django**
+  - **Propuesta de modificación**: Convertir cada parte (servicios, logs, etc.) en aplicaciones Django (por ejemplo, una app “logs”, otra app “xubio_api”, etc.).
+
+- [ ] **Mantener el código de consola en un módulo separado (si sigue coexistiendo)**
+  - **Propuesta de modificación**: Tener un archivo principal para la CLI que importe la lógica de `src`, de modo que no interfiera con la estructura Django.
+
+- [ ] **Actualizar documentación interna y scripts de arranque** 
+  - **Duda/Pendiente**: Ver cómo se ejecutará la aplicación en entorno local y documentar el proceso (e.g., `python manage.py runserver` para Django y un script separado para la consola).
