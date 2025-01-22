@@ -65,19 +65,45 @@
 
 ## **2. Almacenamiento del Token en `config.json`**
 
-- [ ] **Verificar la existencia de `config.json` al inicio**
-  - **Propuesta de modificación**: Crear un método para chequear si el archivo existe; si no, crearlo con estructura inicial (token vacío o null, timestamp).
+### **2.1. Verificar la existencia de `config.json` al inicio**
 
-- [ ] **Leer el token y su timestamp; decidir si es válido (<1 hora)**
-  - **Propuesta de modificación**: Implementar lógica para comparar la hora de creación del token con la hora actual.
+- [ ] **Crear un método para verificar y crear el archivo si no existe**:
+  - Definir la estructura inicial:
+    ```json
+    {
+      "access_token": "",
+      "created_at": ""
+    }
+    ```
+  - Implementar este método en un nuevo archivo, por ejemplo, `src/config_manager.py`.
 
-- [ ] **Solicitar token nuevo si no existe o está vencido; guardar en `config.json`**
-  - **Propuesta de modificación**: Actualizar el archivo con el nuevo token y la nueva marca de tiempo. 
+---
 
-- [ ] **Proteger `config.json`**
-  - **Propuesta de modificación**: Añadirlo a `.gitignore` para que no se suba al repositorio.  
-  - **Duda/Pendiente**: Decidir si se requiere algún cifrado o manipulación adicional por motivos de seguridad.
+### **2.2. Leer el token y su timestamp; decidir si es válido (<1 hora)**
 
+- [ ] **Crear un método para cargar y validar el token**:
+  - Leer el contenido de `config.json`.
+  - Comparar el campo `"created_at"` con la hora actual para determinar si el token sigue siendo válido.
+  - Retornar el token si es válido o `None` si no lo es.
+
+---
+
+### **2.3. Solicitar token nuevo si no existe o está vencido; guardar en `config.json`**
+
+- [ ] **Implementar un flujo para obtener y guardar un nuevo token**:
+  - Usar `TokenService` para obtener el token.
+  - Guardar el token junto con la marca de tiempo actual en `config.json`.
+  - Asegurar que el proceso de escritura sea atómico para evitar inconsistencias.
+
+---
+
+### **2.4. Proteger `config.json`**
+
+- [ ] **Añadir `config.json` al `.gitignore`**:
+  - Evitar que el archivo se suba al repositorio.
+
+- [ ] **Evaluar la necesidad de cifrado**:
+  - Si es necesario proteger el contenido, implementar cifrado al escribir/leer el archivo.
 
 ---
 
@@ -94,10 +120,6 @@
 
 - [ ] **Revisar el esquema de usuarios en Django**
   - **Duda/Pendiente**: Confirmar si el token será compartido entre múltiples usuarios o si cada usuario tendrá su propia sesión/autenticación con la API Xubio.
-
----
-
-## **4. Reestructuración de Carpetas**
 
 - [ ] **Renombrar o mover “src” para ajustarlo al estándar de Django**
   - **Propuesta de modificación**: Convertir cada parte (servicios, logs, etc.) en aplicaciones Django (por ejemplo, una app “logs”, otra app “xubio_api”, etc.).
