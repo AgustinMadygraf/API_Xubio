@@ -2,13 +2,9 @@
 
 ## **1. Refactor de Menú y Uso de `menu_config.json`**
 
-A continuación se describe la **propuesta de modificación** para cada subtarea de la **Tarea 1: “Refactor de Menú y Uso de `menu_config.json`”**. No se proporcionan fragmentos de código, sino lineamientos y objetivos concretos de refactorización.
-
----
-
 ### **1.1. Crear una clase o interfaz común para todas las opciones de menú**
 
-- **Archivo Sugerido**: Podría ser `src/services/menu_option_base.py` (o un nombre equivalente).
+- **Archivo Sugerido**: Podría ser `src/services/menu_option_base.py`
 - **Objetivo**: 
   - Definir una estructura uniforme que represente a cada opción del menú (por ejemplo, un método para obtener la clave, otro para ejecutar la lógica asociada, etc.).
 - **Propuesta de Modificación**:
@@ -23,7 +19,7 @@ A continuación se describe la **propuesta de modificación** para cada subtarea
 
 ### **1.2. Diseñar un mecanismo dinámico para leer y generar las opciones de menú desde `menu_config.json`**
 
-- **Archivo Sugerido**: Se podría centralizar en `src/services/menu_registry.py` o en una sección específica dentro de `menu_service.py`.
+- **Archivo Sugerido**: Se podría centralizar en `src/services/menu_registry.py`
 - **Objetivo**: 
   - Eliminar la dependencia de múltiples `if-elif`.
   - Permitir que, al modificar el archivo JSON, se actualicen las opciones de manera transparente.
@@ -37,7 +33,7 @@ A continuación se describe la **propuesta de modificación** para cada subtarea
 
 ### **1.3. Centralizar la lógica de “llamada a la API + procesamiento de datos” en un método común**
 
-- **Archivo Sugerido**: Podría ubicarse en una clase auxiliar dentro de `menu_service.py` o en un nuevo archivo como `menu_actions.py`.
+- **Archivo Sugerido**: Podría ubicarse en una clase auxiliar dentro de un nuevo archivo como `menu_actions.py`.
 - **Objetivo**:
   - Evitar la repetición de líneas de código para “realizar la petición al endpoint, capturar la respuesta y procesarla con `ClientDataProcessor`”.
   - Estandarizar el manejo de errores y la presentación de resultados.
@@ -82,22 +78,10 @@ A continuación se describe la **propuesta de modificación** para cada subtarea
   - **Propuesta de modificación**: Añadirlo a `.gitignore` para que no se suba al repositorio.  
   - **Duda/Pendiente**: Decidir si se requiere algún cifrado o manipulación adicional por motivos de seguridad.
 
----
-
-## **3. Manejo de Logs según Entorno (Desarrollo/Producción)**
-
-- [ ] **Continuar usando `IS_DEVELOPMENT` desde `.env` para cambiar la configuración**
-  - **Propuesta de modificación**: Ajustar la configuración de nivel de logs para `DEBUG` o `INFO` de manera automática según el valor de `IS_DEVELOPMENT`.
-
-- [ ] **Redirigir logs a “sistem.log”**
-  - **Propuesta de modificación**: Confirmar la ruta y nombre del archivo, y asegurarse de que se conserve la configuración actual (formato `json`, `filters`, etc.).
-
-- [ ] **Gestionar la rotación o tamaño de “sistem.log”** (si es necesario en el futuro)
-  - **Duda/Pendiente**: Decidir si se requieren mecanismos de rotación de logs (por tamaño o fecha) para evitar archivos de gran tamaño.
 
 ---
 
-## **4. Escalabilidad e Integración con Django**
+## **3. Escalabilidad e Integración con Django**
 
 - [ ] **Mantener una estructura compatible con la migración a Django**
   - **Propuesta de modificación**: Planificar las carpetas y módulos de manera que puedan convertirse en una o varias apps de Django (p. ej., separar “services” y “api” en aplicaciones de Django).
@@ -113,7 +97,7 @@ A continuación se describe la **propuesta de modificación** para cada subtarea
 
 ---
 
-## **5. Reestructuración de Carpetas**
+## **4. Reestructuración de Carpetas**
 
 - [ ] **Renombrar o mover “src” para ajustarlo al estándar de Django**
   - **Propuesta de modificación**: Convertir cada parte (servicios, logs, etc.) en aplicaciones Django (por ejemplo, una app “logs”, otra app “xubio_api”, etc.).
