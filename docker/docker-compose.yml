@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  mysqldb:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_DATABASE: xubio_db
+      MYSQL_ROOT_PASSWORD: "Mysql@123"
+    ports:
+      - "3308:3306"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: 
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: api_xubio
+    restart: always
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    env_file:
+      - ../.env
+    environment:
+      MYSQL_HOST: mysqldb
+      MYSQL_PORT: 3306
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: "Mysql@123"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/xubio_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_FLYWAY_URL: jdbc:mysql://mysqldb:3306/xubio_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_FLYWAY_USER: root
+      SPRING_FLYWAY_PASSWORD: "Mysql@123"
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
