@@ -33,26 +33,6 @@ CREATE TABLE IF NOT EXISTS listas_precio (
     nombre VARCHAR(255) NOT NULL,
     activo BOOLEAN,
     tipo INT,
-<<<<<<< HEAD
     descripcion TEXT,
     es_default BOOLEAN
-=======
-    cantidad_items INT,
-    ultima_actualizacion TIMESTAMP,
-    descripcion TEXT,
-    es_default BOOLEAN,
-    moneda_id1 INT,
-    moneda_id2 INT,
-    iva INT,
-    ocultar_sin_precio BOOLEAN,
-    INDEX idx_nombre (nombre),
-    INDEX idx_activo (activo)
-) ENGINE=InnoDB;
-
--- Tabla de clientes
-CREATE TABLE IF NOT EXISTS clientes (
-    cliente_id INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(255) NOT NULL,
-    INDEX idx_cliente_nombre (nombre)
->>>>>>> ee197e169837f18eb013bf0384661b83fe6108f5
 ) ENGINE=InnoDB; 

@@ -44,7 +44,10 @@ public class ListaPrecio {
     @Embeddable
     @Data
     public static class Moneda {
+        @Column(name = "moneda_id1")
         private Integer id1;
+        
+        @Column(name = "moneda_id2")
         private Integer id2;
     }
 } 
