@@ -41,6 +41,11 @@ public class XubioController {
             .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/empresas")
+    public ResponseEntity<List<MiEmpresa>> getAllEmpresas() {
+        return ResponseEntity.ok(dataService.findAll());
+    }
+
     // Endpoints para CentroDeCosto
     @PostMapping("/centros-costo")
     public ResponseEntity<CentroDeCosto> createCentroDeCosto(@RequestBody CentroDeCosto centroDeCosto) {

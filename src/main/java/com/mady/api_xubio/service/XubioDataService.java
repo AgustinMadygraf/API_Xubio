@@ -60,6 +60,10 @@ public class XubioDataService {
         return miEmpresaRepository.findById(nombre);
     }
 
+    public List<MiEmpresa> findAll() {
+        return miEmpresaRepository.findAll();
+    }
+
     // Métodos para CentroDeCosto
     @Transactional
     public CentroDeCosto saveCentroDeCosto(@Valid CentroDeCosto centroDeCosto) {

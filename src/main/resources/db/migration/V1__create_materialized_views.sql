@@ -33,10 +33,6 @@ CREATE TABLE IF NOT EXISTS listas_precio (
     nombre VARCHAR(255) NOT NULL,
     activo BOOLEAN,
     tipo INT,
-<<<<<<< HEAD
-    descripcion TEXT,
-    es_default BOOLEAN
-=======
     cantidad_items INT,
     ultima_actualizacion TIMESTAMP,
     descripcion TEXT,
@@ -54,5 +50,25 @@ CREATE TABLE IF NOT EXISTS clientes (
     cliente_id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(255) NOT NULL,
     INDEX idx_cliente_nombre (nombre)
->>>>>>> ee197e169837f18eb013bf0384661b83fe6108f5
-) ENGINE=InnoDB; 
+) ENGINE=InnoDB;
+
+-- Vistas para resúmenes
+CREATE VIEW v_centros_costo_summary AS
+SELECT 
+    cc.centro_de_costo_id,
+    cc.codigo,
+    cc.nombre,
+    COUNT(*) as total_registros,
+    NOW() as ultima_actualizacion
+FROM centros_de_costo cc
+GROUP BY cc.centro_de_costo_id;
+
+CREATE VIEW v_lista_precios_summary AS
+SELECT 
+    lp.lista_precio_id,
+    lp.nombre,
+    lp.activo,
+    lp.tipo,
+    lp.cantidad_items,
+    lp.ultima_actualizacion
+FROM listas_precio lp; 
