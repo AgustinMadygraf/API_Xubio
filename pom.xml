@@ -78,18 +78,12 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-<<<<<<< HEAD
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <scope>runtime</scope>
-=======
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
->>>>>>> ee197e169837f18eb013bf0384661b83fe6108f5
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -120,19 +114,12 @@
                         <path>
                             <groupId>org.springframework.boot</groupId>
                             <artifactId>spring-boot-configuration-processor</artifactId>
-<<<<<<< HEAD
-=======
                             <version>${project.parent.version}</version>
->>>>>>> ee197e169837f18eb013bf0384661b83fe6108f5
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>1.18.30</version>
-<<<<<<< HEAD
-                            <scope>provided</scope>
-=======
->>>>>>> ee197e169837f18eb013bf0384661b83fe6108f5
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
