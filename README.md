@@ -2,7 +2,7 @@
 Construir la imagen
 
 ```sh
-docker build -t api_xubio .
+docker compose -f 'docker\docker-compose.yml' up -d --build 
 ```
 
 Ejecutar el contenedor
